@@ -80,7 +80,7 @@ public class BitmapTool {
      * 将字节数组转换为 Bitmap 对象，如果字节数组为空则返回 null
      */
     @Nullable
-    public static Bitmap bytesToBimap(@NonNull byte[] bytes) {
+    public static Bitmap bytesToBitmap(@NonNull byte[] bytes) {
         if (bytes.length != 0) {
             return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         } else {

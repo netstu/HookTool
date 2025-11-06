@@ -31,6 +31,7 @@ import com.hchen.hooktool.log.XposedLog;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.Objects;
 
 /**
@@ -57,6 +58,7 @@ public class ChainTool {
     @NonNull
     private final ChainHook chainHook;
     private ChainData chainData;
+    private final HashSet<ChainData> chainDataSet = new HashSet<>();
 
     private ChainTool(@NonNull Class<?> clazz) {
         Objects.requireNonNull(clazz, "[ChainTool]: Class must not be null!!");
@@ -155,22 +157,14 @@ public class ChainTool {
         Objects.requireNonNull(chainData, "[ChainTool]: Chain data must not be null!!");
 
         final ChainData tempChainData = chainData;
-        if (ChainData.chainDataSet.isEmpty()) {
+        if (!chainDataSet.contains(chainData)) {
             runFind();
             if (shouldHook()) {
-                ChainData.chainDataSet.add(tempChainData);
+                chainDataSet.add(tempChainData);
                 CoreTool.hookAll(chainData.members, chainData.iHook);
             }
         } else {
-            if (!ChainData.chainDataSet.contains(chainData)) {
-                runFind();
-                if (shouldHook()) {
-                    ChainData.chainDataSet.add(tempChainData);
-                    CoreTool.hookAll(chainData.members, chainData.iHook);
-                }
-            } else {
-                XposedLog.logW(LogExpand.getTag(), "Duplicate content will be skipped: " + chainData);
-            }
+            XposedLog.logW(LogExpand.getTag(), "Duplicate content will be skipped: " + chainData);
         }
         chainData = null;
     }

@@ -242,7 +242,7 @@ public class MethodHelper {
     /**
      * 返回查找到的全部对象
      */
-    public Method[] list() {
+    public Method[] toArray() {
         return matches().toArray(new Method[0]);
     }
 
@@ -336,8 +336,11 @@ public class MethodHelper {
                 return false;
             if (annotations != null && !Arrays.stream(annotations).allMatch(method::isAnnotationPresent))
                 return false;
-            if (exceptionClasses != null && !Arrays.equals(method.getExceptionTypes(), exceptionClasses))
-                return false;
+            if (exceptionClasses != null) {
+                List<Class<?>> list = Arrays.asList(method.getExceptionTypes());
+                if (!Arrays.stream(exceptionClasses).allMatch(list::contains))
+                    return false;
+            }
 
             return true;
         }).collect(Collectors.toList());

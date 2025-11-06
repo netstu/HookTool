@@ -27,7 +27,6 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * 链式数据
@@ -36,13 +35,14 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 public class ChainData {
     // -------------------------- Data ------------------------------
+
     public ChainType chainType;
     public IHook iHook;
     public boolean ifExist;
     public Member[] members = new Member[1];
-    public static final CopyOnWriteArraySet<ChainData> chainDataSet = new CopyOnWriteArraySet<>();
 
     // -------------------------- Method ------------------------------
+
     public String methodName;
     public Object[] methodParams;
     public Method method;
@@ -64,6 +64,7 @@ public class ChainData {
     }
 
     // -------------------------- Constructor ------------------------------
+
     public Object[] constructorParams;
     public Constructor<?> constructor;
 
@@ -80,6 +81,8 @@ public class ChainData {
         this.constructor = constructor;
         this.chainType = ChainType.CONSTRUCTOR;
     }
+
+    // ------------------------ Exist ---------------------------------
 
     public void setIfExist(boolean ifExist) {
         this.ifExist = ifExist;
@@ -104,21 +107,22 @@ public class ChainData {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof ChainData chainData)) return false;
-        return ifExist == chainData.ifExist &&
+        return // ifExist == chainData.ifExist && ignore
             chainType == chainData.chainType &&
-            // Objects.equals(iHook, chainData.iHook) && ignore
-            // Objects.deepEquals(members, chainData.members) && ignore
-            Objects.equals(methodName, chainData.methodName) &&
-            Objects.deepEquals(methodParams, chainData.methodParams) &&
-            Objects.equals(method, chainData.method) &&
-            Objects.deepEquals(constructorParams, chainData.constructorParams) &&
-            Objects.equals(constructor, chainData.constructor);
+                // Objects.equals(iHook, chainData.iHook) && ignore
+                // Objects.deepEquals(members, chainData.members) && ignore
+                Objects.equals(method, chainData.method) &&
+                Objects.equals(methodName, chainData.methodName) &&
+                Objects.deepEquals(methodParams, chainData.methodParams) &&
+                Objects.equals(constructor, chainData.constructor) &&
+                Objects.deepEquals(constructorParams, chainData.constructorParams);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(chainType, /* iHook ignore */ ifExist,
-            /* Arrays.hashCode(members) ignore */ methodName, Arrays.hashCode(methodParams),
-            method, Arrays.hashCode(constructorParams), constructor);
+        return Objects.hash(chainType,
+            /* ifExist ignore */ /* iHook ignore */ /* Arrays.hashCode(members) ignore */
+            method, methodName, Arrays.hashCode(methodParams),
+            Arrays.hashCode(constructorParams), constructor);
     }
 }

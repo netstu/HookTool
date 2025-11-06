@@ -34,10 +34,10 @@ import com.hchen.hooktool.exception.NonXposedException;
 import com.hchen.hooktool.exception.UnexpectedException;
 import com.hchen.hooktool.log.AndroidLog;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import de.robv.android.xposed.XSharedPreferences;
 
@@ -48,8 +48,8 @@ import de.robv.android.xposed.XSharedPreferences;
  */
 public class PrefsTool {
     private static final String TAG = "PrefsTool";
-    private final static HashMap<String, Xprefs> xPrefsMap = new HashMap<>();
-    private final static HashMap<String, Sprefs> sPrefsMap = new HashMap<>();
+    private final static ConcurrentHashMap<String, Xprefs> xPrefsMap = new ConcurrentHashMap<>();
+    private final static ConcurrentHashMap<String, Sprefs> sPrefsMap = new ConcurrentHashMap<>();
 
     private PrefsTool() {
     }

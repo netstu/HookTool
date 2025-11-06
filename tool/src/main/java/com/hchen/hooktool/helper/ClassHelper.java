@@ -300,27 +300,39 @@ public class ClassHelper {
                 if (annotations != null && !Arrays.stream(annotations).allMatch(cls::isAnnotationPresent))
                     return false;
                 if (superClass != null && !superClass.isAssignableFrom(cls)) return false;
-                if (interfaceClasses != null && !Arrays.equals(cls.getInterfaces(), interfaceClasses))
-                    return false;
+                if (interfaceClasses != null) {
+                    List<Class<?>> list = Arrays.asList(cls.getInterfaces());
+                    if (!Arrays.stream(interfaceClasses).allMatch(list::contains))
+                        return false;
+                }
 
                 if (constructorCount != -1 && cls.getDeclaredConstructors().length != constructorCount)
                     return false;
                 if (constructorClasses != null) {
-                    boolean exist = false;
-                    for (int i = 0; i < cls.getDeclaredConstructors().length; i++) {
-                        Constructor<?> constructor = cls.getDeclaredConstructors()[i];
-                        if (constructor.getParameterCount() != constructorClasses.length)
+                    boolean foundMatchingConstructor = false;
+                    Constructor<?>[] constructors = cls.getDeclaredConstructors();
+                    for (Constructor<?> constructor : constructors) {
+                        if (constructor.getParameterCount() != constructorClasses.length) {
                             continue;
-                        for (int c = 0; c < constructor.getParameterCount(); c++) {
-                            Class<?> actual = constructor.getParameterTypes()[c];
-                            Class<?> want = constructorClasses[c];
-                            if (Objects.equals(want, Any.class)) continue;
-                            exist = Objects.equals(actual, want);
-                            if (!exist) break;
                         }
-                        if (exist) break;
+
+                        boolean currentConstructorMatches = true;
+                        Class<?>[] parameterTypes = constructor.getParameterTypes();
+                        for (int i = 0; i < parameterTypes.length; i++) {
+                            Class<?> want = constructorClasses[i];
+                            if (Objects.equals(want, Any.class)) continue;
+                            if (!Objects.equals(parameterTypes[i], want)) {
+                                currentConstructorMatches = false;
+                                break;
+                            }
+                        }
+
+                        if (currentConstructorMatches) {
+                            foundMatchingConstructor = true;
+                            break;
+                        }
                     }
-                    return exist;
+                    if (!foundMatchingConstructor) return false;
                 }
             } catch (Throwable ignore) {
                 return false;

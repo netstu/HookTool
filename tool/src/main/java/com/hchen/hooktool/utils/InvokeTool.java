@@ -28,7 +28,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 反射工具
@@ -37,8 +37,8 @@ import java.util.HashMap;
  */
 public class InvokeTool {
     private static final String TAG = "InvokeTool";
-    private static final HashMap<String, Method> mMethodCache = new HashMap<>();
-    private static final HashMap<String, Field> mFieldCache = new HashMap<>();
+    private static final ConcurrentHashMap<String, Method> mMethodCache = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, Field> mFieldCache = new ConcurrentHashMap<>();
 
     private InvokeTool() {
     }

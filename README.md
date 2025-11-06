@@ -30,7 +30,7 @@ dependencyResolutionManagement {
 
 ```groovy
 dependencies {
-    implementation 'com.github.HChenX:HookTool:v.2.2.1'
+    implementation 'com.github.HChenX:HookTool:v.2.2.4'
 }
 ```
 

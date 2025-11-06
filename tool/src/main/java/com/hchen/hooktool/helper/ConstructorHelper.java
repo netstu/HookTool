@@ -53,7 +53,6 @@ public class ConstructorHelper {
     private final HashMap<Integer, Integer> paramCountVarMap = new HashMap<>();
     private Class<? extends Annotation>[] annotations;
     private Class<? extends Throwable>[] exceptionClasses;
-    private boolean withSuper = false;
 
     public ConstructorHelper(@NonNull Class<?> clazz) {
         Objects.requireNonNull(clazz, "[ConstructorHelper]: Class must not be null!!");
@@ -127,14 +126,6 @@ public class ConstructorHelper {
     }
 
     /**
-     * 是否查找 Super 类
-     */
-    public ConstructorHelper withSuper(boolean withSuper) {
-        this.withSuper = withSuper;
-        return this;
-    }
-
-    /**
      * 获取查找到的对象，如果查找结果为空或不为单个则抛错
      */
     public HookHelper<Constructor<?>> single() {
@@ -186,7 +177,6 @@ public class ConstructorHelper {
         annotations = null;
         exceptionClasses = null;
         paramCountVarMap.clear();
-        withSuper = false;
     }
 
     /**
@@ -196,13 +186,6 @@ public class ConstructorHelper {
      */
     private List<Constructor<?>> matches() {
         List<Constructor<?>> constructors = new ArrayList<>(Arrays.asList(clazz.getDeclaredConstructors()));
-        if (withSuper) {
-            Class<?> sup = clazz.getSuperclass();
-            while (sup != null) {
-                constructors.addAll(Arrays.asList(sup.getDeclaredConstructors()));
-                sup = sup.getSuperclass();
-            }
-        }
 
         return constructors.stream()
             .filter(constructor -> {
@@ -254,8 +237,11 @@ public class ConstructorHelper {
                     return false;
                 if (annotations != null && !Arrays.stream(annotations).allMatch(constructor::isAnnotationPresent))
                     return false;
-                if (exceptionClasses != null && !Arrays.equals(constructor.getExceptionTypes(), exceptionClasses))
-                    return false;
+                if (exceptionClasses != null) {
+                    List<Class<?>> list = Arrays.asList(constructor.getExceptionTypes());
+                    if (!Arrays.stream(exceptionClasses).allMatch(list::contains))
+                        return false;
+                }
 
                 return true;
             })
