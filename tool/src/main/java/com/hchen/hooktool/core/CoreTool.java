@@ -43,6 +43,7 @@ import com.hchen.hooktool.hook.IHook;
 import com.hchen.hooktool.log.AndroidLog;
 import com.hchen.hooktool.log.LogExpand;
 import com.hchen.hooktool.log.XposedLog;
+import com.hchen.hooktool.utils.InvokeTool;
 import com.hchen.hooktool.utils.PrefsTool;
 import com.hchen.hooktool.utils.ResInjectTool;
 
@@ -1278,6 +1279,91 @@ public class CoreTool extends XposedLog {
     public static Object invokeOriginalMethod(@NonNull Member method, Object thisObject, @NonNull Object... params)
         throws InvocationTargetException, IllegalAccessException {
         return XposedBridge.invokeOriginalMethod(method, thisObject, params);
+    }
+
+    // ------------------------- DeoptimizeMethod ------------------------
+
+    // -------------------------- Method Deoptimize -------------------------------
+    public static boolean deoptimizeMethod(@NonNull Class<?> clazz, @NonNull String methodName, @NonNull Object... params) {
+        return doTry(
+            () -> deoptimizeMethod(findMethod(clazz, methodName, params))
+        ).orElse(false);
+    }
+
+    public static boolean deoptimizeMethod(@NonNull String classPath, @NonNull String methodName, @NonNull Object... params) {
+        return doTry(
+            () -> deoptimizeMethod(findMethod(classPath, methodName, params))
+        ).orElse(false);
+    }
+
+    public static boolean deoptimizeMethod(@NonNull String classPath, ClassLoader classLoader, @NonNull String methodName, @NonNull Object... params) {
+        return doTry(
+            () -> deoptimizeMethod(findMethod(classPath, classLoader, methodName, params))
+        ).orElse(false);
+    }
+
+    public static boolean deoptimizeAllMethod(@NonNull Class<?> clazz, @NonNull String methodName) {
+        return doTry(
+            () -> deoptimizeMethod(findAllMethod(clazz, methodName))
+        ).orElse(false);
+    }
+
+    public static boolean deoptimizeAllMethod(@NonNull String classPath, @NonNull String methodName) {
+        return doTry(
+            () -> deoptimizeMethod(findAllMethod(classPath, methodName))
+        ).orElse(false);
+    }
+
+    public static boolean deoptimizeAllMethod(@NonNull String classPath, ClassLoader classLoader, @NonNull String methodName) {
+        return doTry(
+            () -> deoptimizeMethod(findAllMethod(classPath, classLoader, methodName))
+        ).orElse(false);
+    }
+
+    // -------------------------- Constructor Deoptimize ----------------------------
+    public static boolean deoptimizeConstructor(@NonNull Class<?> clazz, @NonNull Object... params) {
+        return doTry(
+            () -> deoptimizeMethod(findConstructor(clazz, params))
+        ).orElse(false);
+    }
+
+    public static boolean deoptimizeConstructor(@NonNull String classPath, @NonNull Object... params) {
+        return doTry(
+            () -> deoptimizeMethod(findConstructor(classPath, params))
+        ).orElse(false);
+    }
+
+    public static boolean deoptimizeConstructor(@NonNull String classPath, ClassLoader classLoader, @NonNull Object... params) {
+        return doTry(
+            () -> deoptimizeMethod(findConstructor(classPath, classLoader, params))
+        ).orElse(false);
+    }
+
+    public static boolean deoptimizeAllConstructor(@NonNull Class<?> clazz) {
+        return doTry(
+            () -> deoptimizeMethod(findAllConstructor(clazz))
+        ).orElse(false);
+    }
+
+    public static boolean deoptimizeAllConstructor(@NonNull String classPath) {
+        return doTry(
+            () -> deoptimizeMethod(findAllConstructor(classPath))
+        ).orElse(false);
+    }
+
+    public static boolean deoptimizeAllConstructor(@NonNull String classPath, ClassLoader classLoader) {
+        return doTry(
+            () -> deoptimizeMethod(findAllConstructor(classPath, classLoader))
+        ).orElse(false);
+    }
+
+    public static boolean deoptimizeMethod(@NonNull Member... member) {
+        return doTry(() -> {
+            for (Member m : member) {
+                InvokeTool.callStaticMethod(XposedBridge.class, "deoptimizeMethod", new Class<?>[]{Member.class}, m);
+            }
+            return true;
+        }).orElse(false);
     }
 
     // -------------------------- Chain ------------------------------
